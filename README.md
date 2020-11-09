@@ -9,6 +9,6 @@ A program using Reinforcement Learning to simulate the learning process of playi
 ![alt text](https://github.com/mehmetsan/FlappyNeat/blob/main/shots/gen1.jpg?raw=true)
 
 ## References
-https://github.com/techwithtim/NEAT-Flappy-Bird
-<br>
 http://nn.cs.utexas.edu/downloads/papers/stanley.cec02.pdf
+<br>
+https://github.com/techwithtim/NEAT-Flappy-Bird
