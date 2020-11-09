@@ -7,24 +7,28 @@ import pickle
 pygame.font.init()  # init font
 local_dir = os.getcwd()
 
+'''
+WINDOW STATS
+'''
 WIN_WIDTH = 600
 WIN_HEIGHT = 800
 FLOOR = 730
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 END_FONT = pygame.font.SysFont("comicsans", 70)
-DRAW_LINES = False
+
 
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption("Flappy Bird")
 
+'''
+LOAD IMAGES
+'''
 pipe_img = pygame.transform.scale2x(pygame.image.load(os.path.join(local_dir,"res","pipe.png")).convert_alpha())
 bg_img = pygame.transform.scale(pygame.image.load(os.path.join(local_dir,"res","background.png")).convert_alpha(), (600, 900))
 bird_images = [pygame.transform.scale2x(pygame.image.load(os.path.join(local_dir,"res","bird" + str(x) + ".png"))) for x in range(1,4)]
 floor_img = pygame.transform.scale2x(pygame.image.load(os.path.join(local_dir,"res","floor.png")).convert_alpha())
 
 gen = 0
-
-os.path
 
 class Bird:
     """
@@ -43,39 +47,48 @@ class Bird:
         :param y: starting y pos (int)
         :return: None
         """
+        self.img = self.IMGS[0]
+        self.img_count = 0
+
         self.x = x
         self.y = y
-        self.tilt = 0  # degrees to tilt
+
+        # degrees to tilt
+        self.tilt = 0           
         self.tick_count = 0
         self.vel = 0
-        self.height = self.y
-        self.img_count = 0
-        self.img = self.IMGS[0]
+
+        # second variable to store y value
+        self.height = self.y 
 
     def jump(self):
-        """
-        make the bird jump
-        :return: None
-        """
+
         self.vel = -10.5
-        self.tick_count = 0
         self.height = self.y
 
+        # Reset the ticks
+        self.tick_count = 0
+
     def move(self):
-        """
-        make the bird move
-        :return: None
-        """
+ 
         self.tick_count += 1
-        gravity = 1.8
+        # tried experimentaly
+        gravity = 1.8           
+
+        # Increasing acceleration
+        acc = gravity *(self.tick_count)**2
+
 
         # for downward acceleration
-        displacement = self.vel*(self.tick_count) + gravity *(self.tick_count)**2  # calculate displacement
+        displacement = self.vel*(self.tick_count) + acc  
 
-        # terminal velocity
-        if displacement >= 16:
+        # fall velocity control 
+        THRESHOLD = 10
+
+        if displacement >= THRESHOLD:
             displacement = (displacement/abs(displacement)) * 16
 
+        # UPWARDS CHECK
         if displacement < 0:
             displacement -= 2
 
@@ -86,16 +99,11 @@ class Bird:
                 self.tilt = self.MAX_ROTATION
         else:  # tilt down
             if self.tilt > -90:
-                self.tilt -= self.ROT_VEL
+                self.tilt = self.tilt - self.ROT_VEL
 
     def draw(self, win):
-        """
-        draw the bird
-        :param win: pygame window or surface
-        :return: None
-        """
-        self.img_count += 1
 
+        self.img_count += 1
 
         # For animation of bird, loop through three images
         if self.img_count <= self.ANIMATION_TIME:
@@ -122,16 +130,9 @@ class Bird:
         rotated_image = pygame.transform.rotate(self.img, self.tilt)
         new_rect = rotated_image.get_rect(center = self.img.get_rect(topleft = (self.x, self.y)).center)
 
-        win.blit(rotated_image, new_rect.topleft)
-
-
-        
+        win.blit(rotated_image, new_rect.topleft)  
 
     def get_mask(self):
-        """
-        gets the mask for the current image of the bird
-        :return: None
-        """
         return pygame.mask.from_surface(self.img)
 
 
@@ -141,7 +142,12 @@ class Pipe():
     VEL = 5
 
     def __init__(self, x):
-
+        """
+        initialize pipe object
+        :param x: int
+        :param y: int
+        :return" None
+        """
         self.x = x
         self.height = 0
 
@@ -158,10 +164,7 @@ class Pipe():
         self.set_height()
 
     def set_height(self):
-        """
-        set the height of the pipe, from the top of the screen
-        :return: None
-        """
+
         self.height = random.randrange(50, 450)
         self.top = self.height - self.PIPE_TOP.get_height()
         self.bottom = self.height + self.GAP
