@@ -24,6 +24,7 @@ base_img = pygame.transform.scale2x(pygame.image.load(os.path.join("res","base.p
 class Bird():
 
     BIRDS = bird_frames
+    GRAVITY = 5
 
     def __init__(self, x, y):
         """
@@ -34,34 +35,49 @@ class Bird():
         """
         self.x = x
         self.y = y
-        self.tilt = 0  # degrees to tilt
-        self.tick_count = 0
+        self.tilt = 0           # degrees to tilt
+        self.tick_count = 0     # every tick without a jump
         self.vel = 0
         self.height = self.y
         self.img_count = 0
         self.img = self.BIRDS[0]
 
     def jump( self ):
-
         self.vel = -10
         self.y -= 10
 
-    def draw( self , x , y , win ):
-        blitRotateCenter( win, self.img , (self.x, self.y) , self.vel * 3)
-
-    def blitRotateCenter(surf, image, topleft, angle):
+    def move(self):
         """
-        Rotate a surface and blit it to the window
-        :param surf: the surface to blit to
-        :param image: the image surface to rotate
-        :param topLeft: the top left position of the image
-        :param angle: a float value for angle
+        make the bird move
         :return: None
         """
-        rotated_image = pygame.transform.rotate(image, angle)
-        new_rect = rotated_image.get_rect(center = image.get_rect(topleft = topleft).center)
+        self.tick_count += 1
 
-        surf.blit(rotated_image, new_rect.topleft)
+        # for downward acceleration
+        displacement = self.vel*(self.tick_count) + GRAVITY * (self.tick_count)**2  # calculate displacement
+
+        # terminal velocity
+        if displacement >= 16:
+            displacement = (displacement/abs(displacement)) * 16
+
+        if displacement < 0:
+            displacement -= 2
+
+        self.y = self.y + displacement
+
+        if displacement < 0 or self.y < self.height + 50:  # tilt up
+            if self.tilt < self.MAX_ROTATION:
+                self.tilt = self.MAX_ROTATION
+        else:  # tilt down
+            if self.tilt > -90:
+                self.tilt -= self.ROT_VEL
+
+    def draw( self , x , y , win ):
+
+        rotated_image = pygame.transform.rotate(self.img, self.tilt)
+        new_rect = rotated_image.get_rect(center = self.img.get_rect(topleft = (self.x, self.y)).center)
+
+        win.blit(rotated_image, new_rect.topleft)
 
 class Pipe():
 
@@ -97,11 +113,10 @@ class Pipe():
 
     def move(self):
         self.x = self.x - self.vel
-   def draw(self, win):
 
-        # draw top
+    def draw(self, win):
+
         win.blit(self.PIPE_TOP, (self.x, self.top))
-        # draw bottom
         win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
 
     def collide(self, bird, win):
@@ -109,6 +124,7 @@ class Pipe():
         bird_mask = bird.get_mask()
         top_mask = pygame.mask.from_surface(self.PIPE_TOP)
         bottom_mask = pygame.mask.from_surface(self.PIPE_BOTTOM)
+        
         top_offset = (self.x - bird.x, self.top - round(bird.y))
         bottom_offset = (self.x - bird.x, self.bottom - round(bird.y))
 
@@ -119,7 +135,6 @@ class Pipe():
             return True
 
         return False
-
 
 class Floor():
 
@@ -135,6 +150,8 @@ class Floor():
         self.vel = VELOCITY
 
     def move():
+        # Move the two base images
+
         self.rightX = self.rightX - self.vel
         self.leftx  = self.leftx - self.vel
 
@@ -145,24 +162,6 @@ class Floor():
             self.rightX = self.WIDTH
 
     def draw(self, win):
-        """
-        Draw the floor. This is two images that move together.
-        :param win: the pygame surface/window
-        :return: None
-        """
         win.blit(self.IMAGE, (self.x1, self.y))
         win.blit(self.IMAGE, (self.x2, self.y))
 
-def blitRotateCenter(surf, image, topleft, angle):
-    """
-    Rotate a surface and blit it to the window
-    :param surf: the surface to blit to
-    :param image: the image surface to rotate
-    :param topLeft: the top left position of the image
-    :param angle: a float value for angle
-    :return: None
-    """
-    rotated_image = pygame.transform.rotate(image, angle)
-    new_rect = rotated_image.get_rect(center = image.get_rect(topleft = topleft).center)
-
-    surf.blit(rotated_image, new_rect.topleft)
