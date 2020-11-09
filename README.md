@@ -1,3 +1,4 @@
 # FlappyNeat
 An implementation of NEAT (Neuroevolution of Augmenting Topologies) on the classic Flappy Bird game in Python
-![Image](https://ibb.co/GFSc0K8)
+![alt text](https://github.com/mehmetsan/FlappyNeat/blob/main/shots/gen0.jpg
+![alt text](https://github.com/mehmetsan/FlappyNeat/blob/main/shots/gen1.jpg
