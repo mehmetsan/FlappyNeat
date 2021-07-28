@@ -3,6 +3,7 @@ import os
 import neat
 from Bird import Bird
 from Pipe import Pipe
+from Floor import Floor
 
 pygame.font.init()  # init font
 local_dir = os.getcwd()
@@ -24,37 +25,8 @@ pygame.display.set_caption("Flappy Bird")
 LOAD IMAGES
 '''
 bg_img = pygame.transform.scale(pygame.image.load(os.path.join(local_dir,"res","background.png")).convert_alpha(), (600, 900))
-floor_img = pygame.transform.scale2x(pygame.image.load(os.path.join(local_dir,"res","floor.png")).convert_alpha())
 
 gen = 0
-
-
-class Floor:
-
-    VEL = 5
-    WIDTH = floor_img.get_width()
-    IMG = floor_img
-
-    def __init__(self, y):
-
-        self.y = y
-        self.x1 = 0
-        self.x2 = self.WIDTH
-
-    def move(self):
-
-        self.x1 -= self.VEL
-        self.x2 -= self.VEL
-        if self.x1 + self.WIDTH < 0:
-            self.x1 = self.x2 + self.WIDTH
-
-        if self.x2 + self.WIDTH < 0:
-            self.x2 = self.x1 + self.WIDTH
-
-    def draw(self, win):
-
-        win.blit(self.IMG, (self.x1, self.y))
-        win.blit(self.IMG, (self.x2, self.y))
 
 
 def draw_window(win, birds, pipes, floor, score, gen):
