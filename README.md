@@ -11,4 +11,4 @@ A program using Reinforcement Learning to simulate the learning process of playi
 ## References
 http://nn.cs.utexas.edu/downloads/papers/stanley.cec02.pdf
 <br>
-https://github.com/techwithtim/NEAT-Flappy-Bird
+
